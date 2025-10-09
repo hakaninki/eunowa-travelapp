@@ -1,6 +1,6 @@
 # EUNOWA (travelapp)
 
-A Flutter + Firebase social travel app where users share **photo + description + location** and interact via **likes, comments, follows, notifications, map**, and **direct messages (1:1 chat)**. Built with **Clean Architecture** and **Riverpod**.
+A Flutter + Firebase social travel app where users share **photo + description + location** and interact via **likes, comments, follows, notifications, map**, and **direct messages (1:1 chat)**. Built with **Clean Architecture** and **Riverpod**, and secure **Cloudinary unsigned uploads**.
 
 ---
 
@@ -12,6 +12,7 @@ A Flutter + Firebase social travel app where users share **photo + description +
 - [Data Model](#data-model)
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
+- [Security & Secrets](#security--secrets)
 - [Firestore Rules](#firestore-rules)
 - [Recommended Indexes](#recommended-indexes)
 - [Run](#run)
@@ -37,7 +38,7 @@ A Flutter + Firebase social travel app where users share **photo + description +
 ## Tech Stack
 - **Flutter** (Dart) + **Riverpod**
 - **Firebase:** Authentication, Cloud Firestore
-- **Cloudinary:** Unsigned image uploads
+- **Cloudinary:** Unsigned image uploads via secure config
 - **OpenStreetMap / Nominatim:** Geocoding autocomplete
 - **flutter_map:** OSM tiles
 - **cached_network_image:** On-device image cache
@@ -46,36 +47,35 @@ A Flutter + Firebase social travel app where users share **photo + description +
 
 ## Architecture
 Clean, layered:
-- **presentation** (UI widgets/pages)
-- **application** (controllers/state)
-- **core** (models/constants/utils/widgets)
-- **infrastructure/services** (Firestore/Cloudinary/Geocoding clients)
+- **presentation** → UI widgets/pages  
+- **application** → controllers/state management  
+- **core** → constants, models, utils, shared widgets  
+- **infrastructure/services** → Firestore/Cloudinary/Nominatim clients 
 
 ---
 
 ## Directory Structure
 -lib/
- - core/
-   - **constants/ # collections, config, colors, images
-   - **models/ # PostModel, UserModel, CommentModel, ...
-   - **services/
-   - **geocoding/ # Nominatim client/provider
-   - **theme/ # app_theme.dart
-   - **utils/ # firestore_date_utils.dart
-   - **widgets/ # shared widgets
- - features/
-   - **auth/ # pages, widgets, providers, services
-   - **home/ # sliver feed + post card + search
-   - **main/ # main nav providers/pages
-   - **map/ # map page, markers, providers
-   - **notifications/ # models, provider, service, UI
-   - **post/ # controllers, providers, services, UI
-   - **profile/ # header, grid, edit profile
-   - **splash/ # splash_page.dart
-   - **user/ # follow system (pages/providers/services)
-   - **chat/ # conversations, chat page, providers, service
-   - **firebase_options.dart
- - main.dart
+├─ core/
+│ ├─ constants/ # collections, config, colors, images
+│ ├─ models/ # PostModel, UserModel, CommentModel, ...
+│ ├─ utils/ # helpers & date formatters
+│ ├─ widgets/ # shared UI widgets
+│ ├─ geocoding/ # Nominatim client/provider
+│ └─ theme/ # app_theme.dart
+├─ features/
+│ ├─ auth/ # pages, widgets, providers, services
+│ ├─ home/ # sliver feed, post card, search
+│ ├─ main/ # main nav pages/providers
+│ ├─ map/ # map page, markers, providers
+│ ├─ notifications/ # models, provider, service, UI
+│ ├─ post/ # controllers, providers, services, UI
+│ ├─ profile/ # profile header, grid, edit profile
+│ ├─ user/ # follow system
+│ ├─ chat/ # conversations, messages, providers, service
+│ └─ splash/ # splash_page.dart
+├─ firebase_options.dart
+└─ main.dart
 
 
 
@@ -129,15 +129,15 @@ flutter pub get
 
 - Download google-services.json (Android) / GoogleService-Info.plist (iOS).
 
-- Optionally run:
+- (Optional) auto-generate:
 
 ```bash
 flutterfire configure
 ```
-This creates/updates lib/firebase_options.dart.
+This generates lib/firebase_options.dart (keep local, ignore in git).
 
-3) **App configuration**
-Create/update lib/core/constants/app_config.dart:
+3) **Configure Cloudinary & Environment**
+   - Create/update lib/core/constants/app_config.dart:
 
 ```dart
 class AppConfig {
@@ -273,15 +273,15 @@ service cloud.firestore {
 ## Recommended Indexes
  Create in Firestore → Indexes:
 
-* posts: orderBy createdAt desc
+* posts → orderBy createdAt desc
 
-* posts with filter uid == ? + orderBy createdAt desc (composite)
+* posts → where uid == ? + orderBy createdAt desc (composite)
 
-* notifications/{uid}/items: where read == false
+* notifications/{uid}/items → where read == false
 
-* conversations: array-contains participants + orderBy lastMessageAt desc (composite)
+* conversations → array-contains participants + orderBy lastMessageAt desc
 
-* messages: orderBy createdAt asc
+* messages → orderBy createdAt asc
 ---
 
 ## Run
