@@ -337,11 +337,11 @@ flutter test
 ## Demo
 
 <p align="center">
-  <img src="assets/alcqq7.gif" width="48%"/>
-  <img src="assets/alcqsr.gif" width="48%"/>
+  <img src="assets/alcqq7.gif" width="30%"/>
+  <img src="assets/alcqsr.gif" width="30%"/>
 </p>
 
 <p align="center">
-  <img src="assets/alcqwa.gif" width="48%"/>
-  <img src="assets/alcr6n.gif" width="48%"/>
+  <img src="assets/alcqwa.gif" width="30%"/>
+  <img src="assets/alcr6n.gif" width="30%"/>
 </p>
